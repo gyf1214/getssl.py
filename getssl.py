@@ -265,9 +265,9 @@ class GetSSL:
       if status == expect:
         return obj
       elif status not in ( 'valid', 'pending', 'ready', 'processing' ):
-        raise RuntimeError("wait object valid failed url={}, status={}".format(url, status))
+        raise RuntimeError("wait object valid failed url={}, status={}, details={}".format(url, status, obj))
       elif retry <= 0:
-        raise RuntimeError("wait object valid timeout url={}".format(url))
+        raise RuntimeError("wait object valid timeout url={}, status={}, details={}".format(url, status, obj))
       time.sleep(sleep)
   
   def getCSR(self, keySize: int=4096):
@@ -319,21 +319,29 @@ class GetSSL:
       fout.write(certEnc)
     self.logger("save ca_bundle path={}", certPath)
 
-  def getSSL(self):
+  def getSSL(self, dnsWait: int=5):
     orderURL, order = self.acme.newOrder(self.domain)
     authURL = order['authorizations'][0]
     self.logger("new order location={}, auth={}", orderURL, authURL)
     
     challengeURL, challengeDomain, challengeValue = self.acme.getChallenge(authURL)
-    self.dnspod.ensureTxtRecord(self.dnspod.recordFromDomain(challengeDomain), challengeValue)
-    self.logger("challenge record written domain={}", challengeDomain)
+    challengeRecord = self.dnspod.recordFromDomain(challengeDomain)
+    try:
+      self.dnspod.ensureTxtRecord(challengeRecord, challengeValue)
+      self.logger("challenge record written domain={}", challengeDomain)
+      self.logger("sleep {} secs for DNS", dnsWait)
+      time.sleep(dnsWait)
 
-    priv, csr = self.getCSR()
-    
-    self.acme.signAndSend(challengeURL, {})
-    order = self.waitForStatusValid(authURL, 'valid')
-    order = self.waitForStatusValid(orderURL, 'ready')
-    finalURL = order['finalize']
+      priv, csr = self.getCSR()
+      
+      self.acme.signAndSend(challengeURL, {})
+      order = self.waitForStatusValid(authURL, 'valid')
+      order = self.waitForStatusValid(orderURL, 'ready')
+      finalURL = order['finalize']
+    except Exception as ex:
+      raise ex from None
+    finally:
+      self.dnspod.deleteRecord(challengeRecord)
     self.logger("order ready finalize={}", finalURL)
     
     self.acme.finalize(finalURL, csr)
