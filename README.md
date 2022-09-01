@@ -24,8 +24,8 @@ Certificate private key will be saved with a passphrase.
   "baseDomain": "Base domain in dnspod",
   "baseDomain": "xyz.org",
   "workingDir": "Working directory to save the certs.",
-  "workingDir": "Each cert is identified by domain and date,",
-  "workingDir": "so note that cert with same domain and signed in the same date will overwrite previous one.",
+  "workingDir": "Each cert is identified by domain and date.",
+  "workingDir": "Note that cert with same domain and signed in the same date will overwrite previous one.",
   "workingDir": "~/.ssl"
 }
 ```
