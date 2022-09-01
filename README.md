@@ -13,19 +13,17 @@ Certificate private key will be saved with a passphrase.
 ## Config File
 ```json
 {
-  // ACME server directory",
+  "ca": "ACME server directory",
   "ca": "https://acme-staging-v02.api.letsencrypt.org/directory",
-  // dnspos API URL
+  "dnspod": "DNSpod API URL",
   "dnspod": "https://dnsapi.cn",
-  // ACME account key
+  "accountKey": "ACME account key",
   "accountKey": "~/.ssh/id_rsa",
-  // dnspod token (= id,token)
+  "dnspodToken": "DNSPod token (= id,token)",
   "dnspodToken": "123456,*********************",
-  // base domain in dnspod
+  "baseDomain": "Base domain in dnspod",
   "baseDomain": "xyz.org",
-  // working directory to save the certs
-  // each cert is identified by domain and date
-  // so note that cert with same domain and signed in the same date will overwrite previous one
+  "workingDir": "Working directory to save the certs. Each cert is identified by domain and date, so note that cert with same domain and signed in the same date will overwrite previous one.",
   "workingDir": "~/.ssl"
 }
 ```
