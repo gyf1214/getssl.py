@@ -350,6 +350,6 @@ class GetSSL:
     self.saveSSL(priv, csr, cert)
 
 if __name__ == '__main__':
-  if len(sys.argv) < 2:
+  if len(sys.argv) <= 2:
     raise ValueError('Must provide config file and domain')
   GetSSL(sys.argv[1], sys.argv[2]).run()
